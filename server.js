@@ -3,13 +3,21 @@ const keys = require('./config/keys.js');
 
 const app = express();
 
+// Setting up DB
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://127.0.0.1:27017/test');
+mongoose.connect(keys.mongoURI);
+// Setup database models
+require('./model/Account');
 
 // Routes
-app.get('/auth', async(req, res) => {
-console.log(req.query);
-res.send("Hello World! It is " + Date.now());
+app.get('/account', async(req, res) => {
+
+    console.log(req.query);
+    const {username, password} = req.query;
+    console.log(username);
+    console.log(password);
+    res.send('hello');
+
 });
 
 app.listen(keys.port, () => {
