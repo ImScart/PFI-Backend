@@ -1,11 +1,14 @@
 {
   "name": "loginbackend",
   "version": "1.0.0",
-  "description": "Backend for the Login Project",
+  "description": "Backend pour la PFI",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mathieu",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
