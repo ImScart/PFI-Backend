@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const Account = mongoose.model('accounts');
 
+const argon2i =require('argon2-ffi').argon2i;
+const crypto = require('crypto');
 module.exports = app =>
 {
     // Routes
@@ -17,25 +19,22 @@ module.exports = app =>
         var userAccount = await Account.findOne({username: rUsername})
         if(userAccount != null)
         {
-            if(rPassword == userAccount.password)
-            {
-                console.log("Retrieving account")
-                userAccount.lastAuthentication = Date.now();
-                await userAccount.save();
-                res.send(userAccount);
-                return;
-            }
-            else
-            {
-                res.send("Invalid credentials");
-                return;
-            }
-
-        }
-        else
-        {
-            res.send("Invalid credentials");
-            return;
+            argon2i.verify(userAccount.password,rPassword).then(async success =>
+                {
+                    if(success)
+                    {
+                        userAccount.lastAuthentication = Date.now();
+                        await userAccount.save();
+                        res.send(userAccount);
+                        return;
+                    }
+                    else
+                    {
+                        res.send("Invalid credentials");
+                        return;
+                    }
+                    
+                });
         }
 
     });
@@ -53,19 +52,22 @@ module.exports = app =>
         if(userAccount == null)
         {
             // Create a new user
-            console.log("Creating a new account...")
+            crypto.randomBytes(32,function(err,salt)
             {
-                var newAccount = new Account({
-                    username : rUsername,
-                    password : rPassword,
-
-                    lastAuthentication : Date.now()
-                });
-                await newAccount.save();
-
-                res.send(newAccount);
-                return;
-            }
+                argon2i.hash(rPassword,salt).then(async hash=>
+                    {
+                        var newAccount = new Account({
+                            username : rUsername,
+                            password : hash,
+                            salt : salt,
+        
+                            lastAuthentication : Date.now()
+                        });
+                        await newAccount.save();
+                        res.send(newAccount);
+                        return;
+                    });
+            });
         }
         else
         {
