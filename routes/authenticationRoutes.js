@@ -22,19 +22,20 @@ module.exports = app =>
             return;
         }
 
-        var userAccount = await Account.findOne({username: rUsername})
+        var userAccount = await Account.findOne({username: rUsername}, 'username password')
         if(userAccount != null)
         {
             argon2i.verify(userAccount.password,rPassword).then(async success =>
                 {
                     if(success)
                     {
+                        console.log("Someone logged in");
                         userAccount.lastAuthentication = Date.now();
                         await userAccount.save();
 
                         response.code = 0;
                         response.msg = ("Account found");
-                        response.data = userAccount;
+                        response.data = (({username}) => ({username}))(userAccount);
                         res.send(response);
                         return;
                     }
@@ -73,7 +74,7 @@ module.exports = app =>
             return;
         }
 
-        var userAccount = await Account.findOne({username: rUsername})
+        var userAccount = await Account.findOne({username: rUsername}, '_id')
         if(userAccount == null)
         {
             // Create a new user
@@ -88,10 +89,10 @@ module.exports = app =>
         
                             lastAuthentication : Date.now()
                         });
+                        console.log("Created a new account");
                         await newAccount.save();
                         response.code = 0;
-                        response.msg = ("Account found");
-                        response.data = userAccount;
+                        response.msg = ("Account created");
                         res.send(response);
                     });
             });
