@@ -9,10 +9,16 @@ module.exports = app =>
 
     //Login
     app.post('/account/login', async(req, res) => {
+
+        var response = {};
+
+
         const {rUsername, rPassword} = req.body;
         if(rUsername ==null || rPassword == null)
         {
-            res.send("Invalid credentials");
+            response.code = 1;
+            response.msg = ("Invalid credentials");
+            res.send(response);
             return;
         }
 
@@ -25,26 +31,45 @@ module.exports = app =>
                     {
                         userAccount.lastAuthentication = Date.now();
                         await userAccount.save();
-                        res.send(userAccount);
+
+                        response.code = 0;
+                        response.msg = ("Account found");
+                        response.data = userAccount;
+                        res.send(response);
                         return;
                     }
                     else
                     {
-                        res.send("Invalid credentials");
+                        response.code = 1;
+                        response.msg = ("Invalid credentials");
+                        res.send(response);
                         return;
                     }
                     
                 });
+        }
+        else
+        {
+            response.code = 1;
+            response.msg = ("Invalid credentials");
+            res.send(response);
+            return;
         }
 
     });
 
     //Register
     app.post('/account/register', async(req, res) => {
+
+        var response = {};
+
+
         const {rUsername, rPassword} = req.body;
         if(rUsername ==null || rPassword == null)
         {
-            res.send("Invalid credentials");
+            response.code = 1;
+            response.msg = ("Invalid credentials");
+            res.send(response);
             return;
         }
 
@@ -64,15 +89,19 @@ module.exports = app =>
                             lastAuthentication : Date.now()
                         });
                         await newAccount.save();
-                        res.send(newAccount);
-                        return;
+                        response.code = 0;
+                        response.msg = ("Account found");
+                        response.data = userAccount;
+                        res.send(response);
                     });
             });
         }
         else
         {
-                res.send("User already exists");
-                return;
+            response.code = 2;
+            response.msg = ("Username is already taken");
+            res.send(response);
+            return;
         }
 
     });
