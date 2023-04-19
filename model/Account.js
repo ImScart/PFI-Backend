@@ -8,6 +8,8 @@ const accountSchema = new Schema({
 
     lastAuthentication: Date,
 
+    tempToken:String,
+    health:Number,
     
 });
 
