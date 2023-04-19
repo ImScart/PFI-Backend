@@ -3,6 +3,9 @@ const Account = mongoose.model('accounts');
 
 const argon2i =require('argon2-ffi').argon2i;
 const crypto = require('crypto');
+
+const passwordRegex = new RegExp("(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})", "gm");
+
 module.exports = app =>
 {
     // Routes
@@ -14,7 +17,7 @@ module.exports = app =>
 
 
         const {rUsername, rPassword} = req.body;
-        if(rUsername ==null || rPassword == null)
+        if(rUsername ==null || rPassword ==false)
         {
             response.code = 1;
             response.msg = ("Invalid credentials");
@@ -63,10 +66,9 @@ module.exports = app =>
     app.post('/account/register', async(req, res) => {
 
         var response = {};
-
-
         const {rUsername, rPassword} = req.body;
-        if(rUsername ==null || rPassword == null)
+
+        if(rUsername==null || !passwordRegex.test(rPassword))
         {
             response.code = 1;
             response.msg = ("Invalid credentials");
