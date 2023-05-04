@@ -27,7 +27,7 @@ module.exports = app =>
             return;
         }
 
-        var userAccount = await Account.findOne({username: rUsername}, 'username password tempToken health')
+        var userAccount = await Account.findOne({username: rUsername}, 'username password tempToken potionDeVie potionDeVitesse')
         if(userAccount != null)
         {
             argon2i.verify(userAccount.password,rPassword).then(async success =>
@@ -41,7 +41,7 @@ module.exports = app =>
 
                         response.code = 0;
                         response.msg = ("Account found");
-                        response.data = (({username,tempToken,health}) => ({username,tempToken,health}))(userAccount);
+                        response.data = (({username,tempToken,potionDeVie,potionDeVitesse}) => ({username,tempToken,potionDeVie,potionDeVitesse}))(userAccount);
                         res.send(response);
                         return;
                     }
@@ -95,8 +95,9 @@ module.exports = app =>
                     {
                         var newAccount = new Account({
                             username : rUsername,
-                            health: 100,
                             tempToken : 0,
+                            potionDeVie:0,
+                            potionDeVitesse:0,
                             password : hash,
                             salt : salt,
         
@@ -121,15 +122,22 @@ module.exports = app =>
     });
 
     //ModifyHealth
-    app.post('/account/health', async(req, res) => {
+    app.post('/account/modify', async(req, res) => {
         var response = {};
 
 
-        const {rUsername, rTempToken} = req.body;
+        const {rUsername, rTempToken, rIntValueToChange, rIntNewNumber} = req.body;
         if(rTempToken == null || rUsername == null)
         {
             response.code = 1;
             response.msg = ("Invalid credentials");
+            res.send(response);
+            return;
+        }
+        if(rIntValueToChange == null|| rIntNewNumber == null)
+        {
+            response.code = 2;
+            response.msg = ("Invalid value");
             res.send(response);
             return;
         }
@@ -139,8 +147,17 @@ module.exports = app =>
         {
             if(userAccount.tempToken == rTempToken)
             {
-                console.log("A value is being changed");
-                userAccount.health = 69;
+                
+                if(rIntValueToChange ==1)
+                {
+                    console.log("Health potion value is being changed");
+                    userAccount.potionDeVie = rIntNewNumber;
+                }
+                else if(rIntValueToChange ==2)
+                {
+                    console.log("Speed potion value is being changed");
+                    userAccount.potionDeVitesse = rIntNewNumber;
+                }
                 await userAccount.save();
 
                 response.code = 0;
