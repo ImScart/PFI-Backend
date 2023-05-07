@@ -95,7 +95,7 @@ module.exports = app =>
                     {
                         var newAccount = new Account({
                             username : rUsername,
-                            tempToken : 0,
+                            tempToken: "userHasNotLoggedInYet",
                             potionDeVie:0,
                             potionDeVitesse:0,
                             password : hash,
@@ -121,7 +121,7 @@ module.exports = app =>
 
     });
 
-    //ModifyHealth
+    //Modify Values Stored In Existing User
     app.post('/account/modify', async(req, res) => {
         var response = {};
 
