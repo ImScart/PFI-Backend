@@ -27,7 +27,7 @@ module.exports = app =>
             return;
         }
 
-        var userAccount = await Account.findOne({username: rUsername}, 'username password tempToken potionDeVie potionDeVitesse')
+        var userAccount = await Account.findOne({username: rUsername}, 'username password tempToken potionDeVie potionDeVitesse nbrPieces')
         if(userAccount != null)
         {
             argon2i.verify(userAccount.password,rPassword).then(async success =>
@@ -41,7 +41,7 @@ module.exports = app =>
 
                         response.code = 0;
                         response.msg = ("Account found");
-                        response.data = (({username,tempToken,potionDeVie,potionDeVitesse}) => ({username,tempToken,potionDeVie,potionDeVitesse}))(userAccount);
+                        response.data = (({username,tempToken,potionDeVie,potionDeVitesse,nbrPieces}) => ({username,tempToken,potionDeVie,potionDeVitesse,nbrPieces}))(userAccount);
                         res.send(response);
                         return;
                     }
@@ -98,6 +98,7 @@ module.exports = app =>
                             tempToken: "userHasNotLoggedInYet",
                             potionDeVie:0,
                             potionDeVitesse:0,
+                            nbrPieces:0,
                             password : hash,
                             salt : salt,
         
@@ -121,12 +122,11 @@ module.exports = app =>
 
     });
 
-    //Modify Values Stored In Existing User
-    app.post('/account/modify', async(req, res) => {
+    //+1 Values Stored In Existing User
+    app.post('/account/changeValue', async(req, res) => {
         var response = {};
 
-
-        const {rUsername, rTempToken, rIntValueToChange, rIntNewNumber} = req.body;
+        const {rUsername, rTempToken, rIntValueToChange, rAddOrRemove} = req.body;
         if(rTempToken == null || rUsername == null)
         {
             response.code = 1;
@@ -134,7 +134,7 @@ module.exports = app =>
             res.send(response);
             return;
         }
-        if(rIntValueToChange == null|| rIntNewNumber == null)
+        if(rIntValueToChange == null|| rAddOrRemove >1|| rAddOrRemove <-1|| rAddOrRemove ==0)
         {
             response.code = 2;
             response.msg = ("Invalid value");
@@ -142,7 +142,8 @@ module.exports = app =>
             return;
         }
 
-        var userAccount = await Account.findOne({username: rUsername}, 'username tempToken')
+        var userAccount = await Account.findOne({username: rUsername}, 'username tempToken potionDeVie potionDeVitesse nbrPieces')
+
         if(userAccount != null)
         {
             if(userAccount.tempToken == rTempToken)
@@ -151,17 +152,27 @@ module.exports = app =>
                 if(rIntValueToChange ==1)
                 {
                     console.log("Health potion value is being changed");
-                    userAccount.potionDeVie = rIntNewNumber;
+
+                    userAccount.potionDeVie = userAccount.potionDeVie+(1*rAddOrRemove);
                 }
                 else if(rIntValueToChange ==2)
                 {
                     console.log("Speed potion value is being changed");
-                    userAccount.potionDeVitesse = rIntNewNumber;
+
+                    userAccount.potionDeVitesse = userAccount.potionDeVitesse+(1*rAddOrRemove);
                 }
+                else if(rIntValueToChange ==3)
+                {
+                    console.log("Coins value is being changed");
+
+                    userAccount.nbrPieces = userAccount.nbrPieces+(1*rAddOrRemove);
+                }
+                
                 await userAccount.save();
 
                 response.code = 0;
                 response.msg = ("Success");
+                response.data = (({username,potionDeVie,potionDeVitesse,nbrPieces}) => ({username,potionDeVie,potionDeVitesse,nbrPieces}))(userAccount);
                 res.send(response);
                 return;
             }

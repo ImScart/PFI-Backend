@@ -11,6 +11,7 @@ const accountSchema = new Schema({
     tempToken:String,
     potionDeVie:Number,
     potionDeVitesse:Number,
+    nbrPieces:Number,
     
 });
 
