@@ -1,12 +1,14 @@
-function generateToken(length) {
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = characters.length;
-  let counter = 0;
-  while (counter < length) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    counter += 1;
+//Mathieu Chabot
+//Fonction pour générer un jeton aléatoire
+function générerJeton(longeur) {
+  let résultat = '';
+  const caractères = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const longeurCaractères = caractères.length;
+  let compteur = 0;
+  while (compteur < longeur) {
+    résultat += caractères.charAt(Math.floor(Math.random() * longeurCaractères));
+    compteur += 1;
   }
-  return result;
+  return résultat;
 }
-module.exports = { generateToken };
+module.exports = { générerJeton };

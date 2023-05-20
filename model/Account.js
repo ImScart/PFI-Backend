@@ -1,18 +1,20 @@
+//Mathieu Chabot
+//Ce code est le "modèle" de la base de données. Elle décrit ce que chaque compte possède.
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const accountSchema = new Schema({
-    username: String,
-    password: String,
+const compteschema = new Schema({
+    nomUtilisateur: String,
+    motDePasse: String,
     salt: String,
 
-    lastAuthentication: Date,
+    derniereConnexion: Date,
 
-    tempToken:String,
+    jetonTemporaire:String,
     potionDeVie:Number,
     potionDeVitesse:Number,
     nbrPieces:Number,
     
 });
 
-mongoose.model('accounts', accountSchema);
+mongoose.model('comptes', compteschema);
